@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/send_message.css') }}">
+    <script src="{{ url_for('static', filename='scripts/send_message.js') }}" defer></script>
+</head>
+<body>
+    <!-- Logout & Profile Pic -->
+    <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    {% if session['profile_pic'] %}
+        <img src="{{ url_for('static', filename='profile_pics/' + session['profile_pic']) }}" class="profile-pic" alt="Profile Picture">
+    {% endif %}
+
+    <div class="chat-container">
+        <!-- Messages Display -->
+        <div class="messages" id="message-box">
+            <!-- Dynamically filled by JS -->
+        </div>
+
+        <!-- Send Message Form -->
+        <form id="message-form" method="POST" action="{{ url_for('send_message') }}" class="send_message">
+            <input type="text" id="message" name="message" placeholder="Type your message..." required>
+            <button type="submit" class="send">Send</button>
+        </form>
+    </div>
+</body>
+</html>

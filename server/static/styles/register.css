@@ -1,0 +1,136 @@
+body {
+
+    background: linear-gradient(to right, #475063, #b47d49);
+
+    font-family: Arial, sans-serif;
+
+    color: white;
+
+    height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    margin: 0;
+
+}
+
+.registration_form{
+
+    background: linear-gradient(to right, #74493c, #8f99b3);
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    width: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+
+
+.username{
+
+    margin: 5px 0;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 5px;
+
+}
+
+ 
+
+.password{
+
+    margin: 5px 0;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 5px;
+
+}
+
+ 
+
+.register{
+
+    margin: 5px 0;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 5px;
+
+}
+
+ 
+
+.profpic{
+
+    padding: 10px 10px;
+
+    background: linear-gradient(#64295c, #ae6e5b);
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    width: 91.6px;
+
+    font-family: Arial, sans-serif;
+
+    font-family: calibri;
+
+}
+
+ 
+
+.profpic:hover{
+
+    background: linear-gradient(to right, #5b6eae, #93da72);
+
+}
+
+ 
+
+.profile_input{
+
+    display: contents;
+
+}
+
+ 
+
+.register{
+
+    background: linear-gradient(150deg, #36c9c9, #0a33bb);
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+}
+
+.register:hover {
+
+    background: linear-gradient(to right, #5b6eae, #7289da);
+
+}

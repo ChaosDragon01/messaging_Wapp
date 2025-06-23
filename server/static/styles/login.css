@@ -1,0 +1,43 @@
+body {
+    background: linear-gradient(to right, #4a6a7e, #264044);
+    font-family: Arial, sans-serif;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+.login-form {
+    background: linear-gradient(to right, #7089b3, #233f86);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+input, button {
+    margin: 5px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+button {
+    background: linear-gradient(to right, #7289da, #5b6eae);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover {
+    background: linear-gradient(to right, #5b6eae, #7289da);
+}
+.regi-link {
+    color: #7289da;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.regi-link:hover {
+    color: #5b6eae;
+}
+
