@@ -33,10 +33,23 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def ensure_json_file(filepath):
+def ensure_json_file(filepath, initial_data=None):
+    """Ensure a JSON file exists with the given initial data type."""
     if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
         with open(filepath, 'w') as f:
-            json.dump([], f)
+            json.dump(initial_data if initial_data is not None else [], f)
+
+
+def safe_load_json(filepath, fallback, encoding='utf-8'):
+    """Safely load JSON and fallback if corrupted or wrong type."""
+    try:
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+            if not isinstance(data, type(fallback)):
+                raise ValueError("Incorrect JSON structure")
+            return data
+    except (json.JSONDecodeError, ValueError):
+        return fallback
 
 
 def log_request(method, endpoint):
@@ -65,9 +78,7 @@ def log_request(method, endpoint):
         "local_time": local_time
     }
 
-    ensure_json_file(REQUEST_LOG_FILE)
-    with open(REQUEST_LOG_FILE, 'r') as f:
-        logs = json.load(f)
+    logs = safe_load_json(REQUEST_LOG_FILE, [])
     logs.append(log_entry)
     with open(REQUEST_LOG_FILE, 'w') as f:
         json.dump(logs, f, indent=4)
@@ -91,18 +102,12 @@ def login():
             return "Missing username or password", 400
 
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        users = safe_load_json(USER_DATA_FILE, {})
 
-        if os.path.exists(USER_DATA_FILE):
-            with open(USER_DATA_FILE, 'r') as f:
-                try:
-                    users = json.load(f)
-                except json.JSONDecodeError:
-                    users = {}
-
-            if username in users and users[username]['password'] == hashed_password:
-                session['username'] = username
-                session['profile_pic'] = users[username].get('profile_pic', '')
-                return redirect(url_for('send_message'))
+        if username in users and users[username]['password'] == hashed_password:
+            session['username'] = username
+            session['profile_pic'] = users[username].get('profile_pic', '')
+            return redirect(url_for('send_message'))
 
         return render_template('login.html', error='Invalid credentials')
     return render_template('login.html')
@@ -115,12 +120,7 @@ def register():
         password = request.form.get('password')
         profile_pic = request.files.get('profile_pic')
 
-        if not os.path.exists(USER_DATA_FILE):
-            with open(USER_DATA_FILE, 'w') as f:
-                json.dump({}, f)
-
-        with open(USER_DATA_FILE, 'r') as f:
-            users = json.load(f)
+        users = safe_load_json(USER_DATA_FILE, {})
 
         if username in users:
             return render_template('register.html', error='Username already exists')
@@ -151,8 +151,10 @@ def register():
 def send_message():
     if 'username' not in session:
         return redirect(url_for('login'))
+    
 
-    ensure_json_file(MESSAGE_DATA_FILE)
+
+    messages = safe_load_json(MESSAGE_DATA_FILE, [], encoding='utf-8')
 
     if request.method == 'POST':
         profile_pic = session.get('profile_pic', '')
@@ -163,9 +165,6 @@ def send_message():
             "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
-        with open(MESSAGE_DATA_FILE, 'r') as f:
-            messages = json.load(f)
-
         messages.append(new_message)
 
         with open(MESSAGE_DATA_FILE, 'w') as f:
@@ -173,9 +172,6 @@ def send_message():
 
         log_request('POST', '/send_message')
         return redirect(url_for('send_message'))
-
-    with open(MESSAGE_DATA_FILE, 'r') as f:
-        messages = json.load(f)
 
     log_request('GET', '/send_message')
     return render_template('chat.html',
@@ -187,10 +183,7 @@ def get_messages():
     if 'username' not in session:
         return jsonify({"error": "Unauthorized"}), 403
 
-    ensure_json_file(MESSAGE_DATA_FILE)
-    with open(MESSAGE_DATA_FILE, 'r') as f:
-        messages = json.load(f)
-
+    messages = safe_load_json(MESSAGE_DATA_FILE, [])
     return jsonify(messages=messages[-100:])
 
 
@@ -205,16 +198,21 @@ def logout():
 
 
 if __name__ == '__main__':
+    
     from waitress import serve
 
     os.makedirs(DATA_DIR, exist_ok=True)
     os.makedirs(PROFILE_PIC_DIR, exist_ok=True)
 
-    for file_path in [LOGIN_DATA_FILE, MESSAGE_DATA_FILE, REQUEST_LOG_FILE, USER_DATA_FILE]:
-        ensure_json_file(file_path)
+    # Correctly initialize all data files
+    ensure_json_file(LOGIN_DATA_FILE, {})
+    ensure_json_file(USER_DATA_FILE, {})
+    ensure_json_file(MESSAGE_DATA_FILE, [])
+    ensure_json_file(REQUEST_LOG_FILE, [])
 
     port = int(os.environ.get('PORT', 12345))
     serve(app, host='0.0.0.0', port=port)
+
 
 
 # additiona comments for a commit
