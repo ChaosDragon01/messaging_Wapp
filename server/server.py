@@ -5,9 +5,12 @@ from datetime import datetime
 import requests
 from werkzeug.utils import secure_filename
 import hashlib
+from dotenv import load_dotenv
+
+APP_TOKEN = os.getenv("APP_TOKEN")
 
 app = Flask(__name__)
-app.secret_key = 'secretkey'
+app.secret_key = APP_TOKEN
 
 # Base path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +28,9 @@ USER_DATA_FILE = os.path.join(DATA_DIR, 'users.json')
 app.config['UPLOAD_FOLDER'] = PROFILE_PIC_DIR
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-USE_TEST_IP = True
+
+
+USE_TEST_IP = False
 TEST_IP = '8.8.8.8'
 
 
@@ -90,7 +95,7 @@ def index():
         return redirect(url_for('send_message'))
     return redirect(url_for('login'))
 
-
+# login and registration routes
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
